@@ -1,25 +1,25 @@
-local c = require "aoi.core"
+local c = require "aoi.c"
 
 local aoi = {}
 
 function aoi:new(width,high,tilelen,level_count)
-  local ctx = setmetatable({},
-      {
-        __index = self,
-        __gc = function (ctx)
-          for k,v in pairs(ctx) do
-            print("gc",k,v)
-            if k == "core" then
-              c.aoi_delete(v)
-            end
-          end
-        end
-        
-      }
-  local ctx.core = c.aoi_new(width,high,tilelen)
-  local ctx.obj_mgr = {}
-  local ctx.obj_count = 0
-  local ctx.level_count = level_count or 0
+  local ctx = setmetatable({}, {
+              __index = self,
+              __gc = function (ctx)
+                for k,v in pairs(ctx) do
+                  print("gc",k,v)
+                  if k == "core" then
+                    c.aoi_delete(v)
+                  end
+                end
+              end
+          }
+        )
+  
+  ctx.core = c.aoi_new(width,high,tilelen)
+  ctx.obj_mgr = {}
+  ctx.obj_count = 0
+  ctx.level_count = level_count or 0
   return ctx
 end
 
