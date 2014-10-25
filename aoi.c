@@ -401,7 +401,7 @@ _aoi_new(lua_State *L) {
 	aoictx->pool = malloc(sizeof(*aoictx->pool));
 	memset(aoictx->pool,0,sizeof(*aoictx->pool));
 
-	aoictx->map.realwidth = realw	idth;
+	aoictx->map.realwidth = realwidth;
 	aoictx->map.realhigh = realhigh;
 	aoictx->map.width = width;
 	aoictx->map.high = high;
