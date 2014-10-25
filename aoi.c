@@ -78,24 +78,21 @@ dlink_empty(struct dlink *dl) {
 }
 
 struct dlink_node*
-dlink_first(struct dlink *dl)
-{
+dlink_first(struct dlink *dl) {
 	if (dlink_empty(dl))
 		return 0;
 	return dl->head_.next_;
 }
 
 struct dlink_node *
-dlink_last(struct dlink *dl)
-{
+dlink_last(struct dlink *dl) {
 	if (dlink_empty(dl))
 		return 0;
 	return dl->tail_.pre_;
 }
 
 struct dlink_node *
-dlink_pop(struct dlink *dl)
-{
+dlink_pop(struct dlink *dl) {
 	if (dlink_empty(dl))
 		return 0;
 	else {
@@ -106,8 +103,7 @@ dlink_pop(struct dlink *dl)
 }
 
 int 
-dlink_push(struct dlink *dl,struct dlink_node *node)
-{
+dlink_push(struct dlink *dl,struct dlink_node *node) {
 	if (node->pre_ || node->next_)
 		return -1;
 
@@ -119,8 +115,7 @@ dlink_push(struct dlink *dl,struct dlink_node *node)
 }
 
 int 
-dlink_remove(struct dlink_node *node)
-{
+dlink_remove(struct dlink_node *node) {
 	if (!node->pre_ || !node->next_)
 		return -1;
 	node->pre_->next_ = node->next_;
@@ -130,8 +125,7 @@ dlink_remove(struct dlink_node *node)
 }
 
 void 
-dlink_clear(struct dlink *dl)
-{
+dlink_clear(struct dlink *dl) {
 	dl->head_.pre_ = dl->tail_.next_ = 0;
 	dl->head_.next_ = &dl->tail_;
 	dl->tail_.pre_ = &dl->head_;
@@ -439,12 +433,13 @@ _aoi_delete(lua_State *L) {
 int 
 _aoi_enter(lua_State *L) {
 	struct aoi_context *aoi = lua_touserdata(L, 1);
-	float curx = luaL_checknumber(L, 2);
-	float cury = luaL_checknumber(L, 3);
-	float desx = luaL_checknumber(L, 4);
-	float desy = luaL_checknumber(L, 5);
-	int level = luaL_checkinteger(L,6);
-	int range = luaL_checkinteger(L,7);
+	int id = luaL_checkinteger(L, 2);
+	float curx = luaL_checknumber(L, 3);
+	float cury = luaL_checknumber(L, 4);
+	float desx = luaL_checknumber(L, 5);
+	float desy = luaL_checknumber(L, 6);
+	int level = luaL_checkinteger(L,7);
+	int range = luaL_checkinteger(L,8);
 
 	if (curx < 0 || cury < 0 || curx >= aoi->map.width || cury >= aoi->map.high) {
 		luaL_error(L,"[aoi]invalid cur pos[%d:%d]",curx,cury);
@@ -473,7 +468,8 @@ _aoi_enter(lua_State *L) {
 		obj = &temp[0];
 		aoi->pool->freelist = &temp[1];
 	}
-
+	
+	obj->id = id;
 	obj->cur.x = curx;
 	obj->cur.y = cury;
 	obj->des.x = desx;
@@ -547,7 +543,7 @@ _aoi_update(lua_State *L) {
 }
 
 int 
-luaopen_libaoi_c(lua_State *L)
+luaopen_aoi_c(lua_State *L)
 {
 	luaL_checkversion(L);
 	luaL_Reg l[] = {
