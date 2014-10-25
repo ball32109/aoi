@@ -9,6 +9,9 @@ function aoi:new(width,high,tilelen,level_count)
         __gc = function (ctx)
           for k,v in pairs(ctx) do
             print("gc",k,v)
+            if k == "core" then
+              c.aoi_delete(v)
+            end
           end
         end
         
@@ -22,7 +25,7 @@ end
 
 function aoi:enter(id,pos)
   local level_index = self.obj_count / self.level_count + 1
-  local cobj,enter_self,enter_other = c.aoi_enter(self.core,pos.x,pos.y,pos.x,pos.y,level_index,4,id)
+  local cobj,enter_self,enter_other = c.aoi_enter(self.core,id,pos.x,pos.y,pos.x,pos.y,level_index,4)
   self.obj_count = self.obj_count + 1
   self.obj_mgr[id] = {pos = {x = pos.x,y = pos.y},cobj = cobj}
   return enter_self,enter_other
