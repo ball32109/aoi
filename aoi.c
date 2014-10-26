@@ -544,6 +544,11 @@ _aoi_update(lua_State *L) {
 }
 
 int 
+_aoi_viewlist(lua_State *L) {
+
+}
+
+int 
 luaopen_aoi_c(lua_State *L)
 {
 	luaL_checkversion(L);
@@ -553,6 +558,7 @@ luaopen_aoi_c(lua_State *L)
 		{ "aoi_enter", _aoi_enter},
 		{ "aoi_leave", _aoi_leave},
 		{ "aoi_update", _aoi_update},
+		{ "aoi_viewlist", _aoi_viewlist},
 		{ NULL, NULL },
 	};
 
