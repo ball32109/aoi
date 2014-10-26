@@ -7,7 +7,6 @@ function aoi:new(width,high,tilelen,level_count)
               __index = self,
               __gc = function (ctx)
                 for k,v in pairs(ctx) do
-                  print("gc",k,v)
                   if k == "core" then
                     c.aoi_delete(v)
                   end
@@ -45,6 +44,11 @@ function aoi:update(id,np)
   info.pos.x = np.x
   info.pos.y = np.y
   return c.aoi_update(self.core,info.cobj,op.x,op.y,np.x,np.y)
+end
+
+function aoi:viewlist(id)
+  local info = self.obj_mgr[id]
+  return c.aoi_viewlist(self.core,info.cobj)
 end
 
 return aoi
