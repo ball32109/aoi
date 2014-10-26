@@ -329,11 +329,12 @@ map_update(lua_State *L,struct map *m,struct object *obj,struct point *np) {
 
 	struct tile *otl = tile_withpos(m,&op);
 	struct tile *ntl = tile_withpos(m,&obj->cur);
-	if (otl != ntl) {
-		tile_pop(&obj->node);
-		tile_push(ntl, obj->level, &obj->node);
-	}
+	if (otl == ntl)
+		return 0;
 
+	tile_pop(&obj->node);
+	tile_push(ntl, obj->level, &obj->node);
+	
 	struct point obl, otr;
 	if (calc_rect(m, &op, obj->range, &obl, &otr) < 0)
 		return -1;
