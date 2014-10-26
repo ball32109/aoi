@@ -77,20 +77,6 @@ dlink_empty(struct dlink *dl) {
 	return dl->head_.next_ == &dl->tail_ ? 1:0;
 }
 
-struct dlink_node*
-dlink_first(struct dlink *dl) {
-	if (dlink_empty(dl))
-		return 0;
-	return dl->head_.next_;
-}
-
-struct dlink_node *
-dlink_last(struct dlink *dl) {
-	if (dlink_empty(dl))
-		return 0;
-	return dl->tail_.pre_;
-}
-
 struct dlink_node *
 dlink_pop(struct dlink *dl) {
 	if (dlink_empty(dl))
