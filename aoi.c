@@ -257,13 +257,13 @@ int
 map_enter(lua_State *L,struct map *m,struct object *obj) {
 	struct tile *tl = tile_withpos(m,&obj->cur);
 	if (tl == NULL) {
-		luaL_error(L,"[aoi]invalid pos[%d:%d]",obj->cur.x,obj->cur.y);
+		luaL_error(L,"[map_enter]invalid pos[%d:%d]",obj->cur.x,obj->cur.y);
 		return -1;
 	}
 
 	struct point bl,tr;
 	if (calc_rect(m,&obj->cur,obj->range,&bl,&tr) < 0) {
-		luaL_error(L,"[aoi]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.y,obj->range);
+		luaL_error(L,"[map_enter]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.y,obj->range);
 		return -1;
 	}
 
@@ -291,13 +291,13 @@ int
 map_leave(lua_State *L,struct map *m,struct object *obj) {
 	struct tile *tl = tile_withpos(m,&obj->cur);
 	if (tl == NULL) {
-		luaL_error(L,"[aoi]invalid pos[%d:%d]",obj->cur.x,obj->cur.y);
+		luaL_error(L,"[map_leave]invalid pos[%d:%d]",obj->cur.x,obj->cur.y);
 		return -1;
 	}
 
 	struct point bl,tr;
 	if (calc_rect(m,&obj->cur,obj->range,&bl,&tr) < 0) {
-		luaL_error(L,"[aoi]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.y,obj->range);
+		luaL_error(L,"[map_leave]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.y,obj->range);
 		return -1;
 	}
 
@@ -443,11 +443,11 @@ _aoi_enter(lua_State *L) {
 	int range = luaL_checkinteger(L,8);
 
 	if (curx < 0 || cury < 0 || curx >= aoi->map.width || cury >= aoi->map.high) {
-		luaL_error(L,"[aoi]invalid cur pos[%d:%d]",curx,cury);
+		luaL_error(L,"[_aoi_enter]invalid cur pos[%d:%d]",curx,cury);
 		return 0;
 	}
 	if (desx < 0 || desy < 0 || desx >= aoi->map.width || desy >= aoi->map.high) {
-		luaL_error(L,"[aoi]invalid des pos[%d:%d]",desx,desy);
+		luaL_error(L,"[_aoi_enter]invalid des pos[%d:%d]",desx,desy);
 		return 0;
 	}
 
@@ -514,12 +514,12 @@ _aoi_update(lua_State *L) {
 	np.y = luaL_checknumber(L, 6);
 
 	if (op.x >= aoi->map.width || op.y >= aoi->map.high || np.x >= aoi->map.width || np.y >= aoi->map.high) {
-		luaL_error(L,"[aoi]move error,invalid pos[%d:%d]->[%d:%d].",op.x,op.y,np.x,np.y);
+		luaL_error(L,"[_aoi_update]invalid pos[%d:%d]->[%d:%d].",op.x,op.y,np.x,np.y);
 		return 0; 
 	}
 
 	if (op.x < 0 || op.y < 0 || np.x < 0 || np.y < 0) {
-		luaL_error(L,"[aoi]move error,invalid pos[%d:%d]->[%d:%d].",op.x,op.y,np.x,np.y);
+		luaL_error(L,"[_aoi_update]invalid pos[%d:%d]->[%d:%d].",op.x,op.y,np.x,np.y);
 		return 0; 
 	}
 
@@ -531,13 +531,13 @@ _aoi_update(lua_State *L) {
 	int ret = 0;
 	if (calc_dist(&obj->cur, &op) != 0) {
 		if ((ret = map_update(L,&aoi->map, obj, &op)) < 0) {
-			luaL_error(L,"[aoi]move error,erro:%d",ret);
+			luaL_error(L,"[_aoi_update]erro:%d",ret);
 			return 0; 
 		}
 	}
 
 	if ((ret = map_update(L,&aoi->map, obj, &np)) < 0) {
-		luaL_error(L,"[aoi]move error,erro:%d.",ret);
+		luaL_error(L,"[_aoi_update]erro:%d.",ret);
 		return 0; 
 	}
 	return 4;
@@ -545,7 +545,43 @@ _aoi_update(lua_State *L) {
 
 int 
 _aoi_viewlist(lua_State *L) {
+	struct aoi_context *aoi = lua_touserdata(L, 1);
+	struct object *obj = lua_touserdata(L, 2);
 
+	struct tile *tl = tile_withpos(&aoi->map,&obj->cur);
+	if (tl == NULL) {
+		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d]",obj->cur.x,obj->cur.y);
+		return 0;
+	}
+
+	struct point bl,tr;
+	if (calc_rect(&aoi->map,&obj->cur,obj->range,&bl,&tr) < 0) {
+		luaL_error(L,"[_aoi_viewlist]invalid pos[%d:%d],range[%d]",obj->cur.x,obj->cur.y,obj->range);
+		return 0;
+	}
+
+	lua_newtable(L);
+
+	int x,y;
+	for(y = bl.y;y <= tr.y;y++) {
+		for(x = bl.x;x <= tr.x;x++) {
+			struct tile *tl = tile_withrc(&aoi->map,y,x);
+			if (tl == NULL) {
+				luaL_error(L,"[_aoi_viewlist]invalid rc[%d:%d],range[%d]",y,x);
+				return 0;
+			}
+
+			struct dlink *dl = tile_level(tl, COMMON_LEVEL);
+			make_table(L,dl,obj,-1,1);
+
+			if (obj->level != COMMON_LEVEL) {
+				dl = tile_level(tl, obj->level);
+				make_table(L,dl,obj,-1,1);
+			}
+		}
+	}
+
+	return 1;
 }
 
 int 
