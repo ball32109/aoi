@@ -244,10 +244,10 @@ make_table(lua_State *L,struct dlink *dl,struct object *self,int index,int flag)
 
 		if (flag == 0) {
 			lua_pushinteger(L, obj->id);
-			lua_rawseti(L, index-1, sindex++);
+			lua_rawseti(L, index-2, sindex++);
 		}
 		lua_pushinteger(L, obj->id);
-		lua_rawseti(L, index, oindex++);
+		lua_rawseti(L, index-1, oindex++);
 
 		obj = (struct object*) obj->node.next_;
 	}
