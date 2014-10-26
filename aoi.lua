@@ -6,11 +6,7 @@ function aoi:new(width,high,tilelen,level_count)
   local ctx = setmetatable({}, {
               __index = self,
               __gc = function (ctx)
-                for k,v in pairs(ctx) do
-                  if k == "core" then
-                    c.aoi_delete(v)
-                  end
-                end
+                  c.aoi_delete(ctx.core)
               end
           }
         )
@@ -25,8 +21,8 @@ end
 function aoi:enter(id,pos)
   local level_index = self.obj_count / self.level_count + 1
   local cobj,enter_self,enter_other = c.aoi_enter(self.core,id,pos.x,pos.y,pos.x,pos.y,level_index,4)
-  self.obj_count = self.obj_count + 1
   self.obj_mgr[id] = {pos = {x = pos.x,y = pos.y},cobj = cobj}
+  self.obj_count = self.obj_count + 1
   return enter_self,enter_other
 end
 
