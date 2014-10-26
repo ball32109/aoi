@@ -23,7 +23,7 @@ print("enter_other")
 dump(enter_other)
 print("@@@@@@@@@@@@@@@@@")
 
-function move(id,pos)
+function update(id,pos)
   local enter_self,enter_other,leave_self,leave_other = aoi_inst:update(id,{x = pos.x,y = pos.y})
   print("enter_self")
   dump(enter_self)
@@ -43,9 +43,16 @@ function sleep(n)
    os.execute("sleep " .. n)
 end
 
-while true do
-  begin.x = begin.x + 2
-  begin.y = begin.y + 2
-  move(0,begin)
-  sleep(1)
+function move()
+  while true do
+    begin.x = begin.x + 2
+    begin.y = begin.y + 2
+    update(0,begin)
+    sleep(1)
+  end
 end
+
+local viewlist = aoi_inst:viewlist(0)
+print("viewlist")
+dump(viewlist)
+
