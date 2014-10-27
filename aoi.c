@@ -11,13 +11,13 @@
 #define COMMON_LEVEL 0
 
 struct dlink_node {
-	struct dlink_node *pre_;
-	struct dlink_node *next_;
+	struct dlink_node *pre;
+	struct dlink_node *nxt;
 };
 
 struct dlink {
-	struct dlink_node head_;
-	struct dlink_node tail_;
+	struct dlink_node head;
+	struct dlink_node tail;
 };
 
 struct point {
@@ -74,47 +74,36 @@ dlink_remove(struct dlink_node *node);
 
 int 
 dlink_empty(struct dlink *dl) {
-	return dl->head_.next_ == &dl->tail_ ? 1:0;
-}
-
-struct dlink_node *
-dlink_pop(struct dlink *dl) {
-	if (dlink_empty(dl))
-		return 0;
-	else {
-		struct dlink_node *node = dl->head_.next_;
-		dlink_remove(node);
-		return node;
-	}
+	return dl->head.nxt == &dl->tail ? 1:0;
 }
 
 int 
-dlink_push(struct dlink *dl,struct dlink_node *node) {
-	if (node->pre_ || node->next_)
+dlink_add(struct dlink *dl,struct dlink_node *node) {
+	if (node->pre || node->nxt)
 		return -1;
 
-	dl->tail_.pre_->next_ = node;
-	node->pre_ = dl->tail_.pre_;
-	dl->tail_.pre_ = node;
-	node->next_ = &dl->tail_;
+	dl->tail.pre->nxt = node;
+	node->pre = dl->tail.pre;
+	dl->tail.pre = node;
+	node->nxt = &dl->tail;
 	return 0;
 }
 
 int 
 dlink_remove(struct dlink_node *node) {
-	if (!node->pre_ || !node->next_)
+	if (!node->pre || !node->nxt)
 		return -1;
-	node->pre_->next_ = node->next_;
-	node->next_->pre_ = node->pre_;
-	node->pre_ = node->next_ = 0;
+	node->pre->nxt = node->nxt;
+	node->nxt->pre = node->pre;
+	node->pre = node->nxt = 0;
 	return 0;
 }
 
 void 
 dlink_clear(struct dlink *dl) {
-	dl->head_.pre_ = dl->tail_.next_ = 0;
-	dl->head_.next_ = &dl->tail_;
-	dl->tail_.pre_ = &dl->head_;
+	dl->head.pre = dl->tail.nxt = 0;
+	dl->head.nxt = &dl->tail;
+	dl->tail.pre = &dl->head;
 }
 
 struct tile *tile_withrc(struct map *m,int r,int c);
@@ -176,7 +165,7 @@ tile_level(struct tile* tl,int level) {
 void 
 tile_push(struct tile* tl,int level,struct dlink_node *node) {
 	struct dlink *dl = tile_level(tl, level);
-	dlink_push(dl, node);
+	dlink_add(dl, node);
 }
 
 void 
@@ -221,10 +210,10 @@ make_table(lua_State *L,struct dlink *dl,struct object *self,int index,int flag)
 	int sindex = 1;
 	int oindex = 1;
 
-	struct object *obj = (struct object*) dl->head_.next_;
-	while (obj != (struct object*) &dl->tail_) {
+	struct object *obj = (struct object*) dl->head.nxt;
+	while (obj != (struct object*) &dl->tail) {
 		if (obj == self) {
-			obj = (struct object*) obj->node.next_;
+			obj = (struct object*) obj->node.nxt;
 			continue;
 		}
 
@@ -235,7 +224,7 @@ make_table(lua_State *L,struct dlink *dl,struct object *self,int index,int flag)
 		lua_pushinteger(L, obj->id);
 		lua_rawseti(L, index-1, oindex++);
 
-		obj = (struct object*) obj->node.next_;
+		obj = (struct object*) obj->node.nxt;
 	}
 }
 
