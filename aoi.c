@@ -412,17 +412,11 @@ _aoi_enter(lua_State *L) {
 	int id = luaL_checkinteger(L, 2);
 	float curx = luaL_checknumber(L, 3);
 	float cury = luaL_checknumber(L, 4);
-	float desx = luaL_checknumber(L, 5);
-	float desy = luaL_checknumber(L, 6);
-	int level = luaL_checkinteger(L,7);
-	int range = luaL_checkinteger(L,8);
+	int level = luaL_checkinteger(L,5);
+	int range = luaL_checkinteger(L,6);
 
 	if (curx < 0 || cury < 0 || curx >= aoi->map.width || cury >= aoi->map.high) {
 		luaL_error(L,"[_aoi_enter]invalid cur pos[%d:%d]",curx,cury);
-		return 0;
-	}
-	if (desx < 0 || desy < 0 || desx >= aoi->map.width || desy >= aoi->map.high) {
-		luaL_error(L,"[_aoi_enter]invalid des pos[%d:%d]",desx,desy);
 		return 0;
 	}
 
@@ -448,8 +442,6 @@ _aoi_enter(lua_State *L) {
 	obj->id = id;
 	obj->cur.x = curx;
 	obj->cur.y = cury;
-	obj->des.x = desx;
-	obj->des.y = desy;
 	obj->level = level;
 	obj->range = range;
 
@@ -480,21 +472,12 @@ _aoi_update(lua_State *L) {
 	struct aoi_context *aoi = lua_touserdata(L, 1);
 	struct object *obj = lua_touserdata(L, 2);
 
-	struct point op;
-	op.x = luaL_checknumber(L, 3);
-	op.y = luaL_checknumber(L, 4);
-
 	struct point np;
-	np.x = luaL_checknumber(L, 5);
-	np.y = luaL_checknumber(L, 6);
+	np.x = luaL_checknumber(L, 3);
+	np.y = luaL_checknumber(L, 4);
 
-	if (op.x >= aoi->map.width || op.y >= aoi->map.high || np.x >= aoi->map.width || np.y >= aoi->map.high) {
-		luaL_error(L,"[_aoi_update]invalid pos[%d:%d]->[%d:%d].",op.x,op.y,np.x,np.y);
-		return 0; 
-	}
-
-	if (op.x < 0 || op.y < 0 || np.x < 0 || np.y < 0) {
-		luaL_error(L,"[_aoi_update]invalid pos[%d:%d]->[%d:%d].",op.x,op.y,np.x,np.y);
+	if (np.x < 0 || np.y < 0 || np.x >= aoi->map.width || np.y >= aoi->map.high) {
+		luaL_error(L,"[_aoi_update]invalid pos[%d:%d].",np.x,np.y);
 		return 0; 
 	}
 
@@ -504,12 +487,6 @@ _aoi_update(lua_State *L) {
 	lua_newtable(L); //-1 leave other
 
 	int ret = 0;
-	if (calc_dist(&obj->cur, &op) != 0) {
-		if ((ret = map_update(L,&aoi->map, obj, &op)) < 0) {
-			luaL_error(L,"[_aoi_update]erro:%d",ret);
-			return 0; 
-		}
-	}
 
 	if ((ret = map_update(L,&aoi->map, obj, &np)) < 0) {
 		luaL_error(L,"[_aoi_update]erro:%d.",ret);
