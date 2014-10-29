@@ -20,7 +20,7 @@ end
 
 function aoi:enter(id,pos)
   local level_index = self.obj_count / self.level_count + 1
-  local cobj,enter_self,enter_other = c.aoi_enter(self.core,id,pos.x,pos.y,pos.x,pos.y,level_index,4)
+  local cobj,enter_self,enter_other = c.aoi_enter(self.core,id,pos.x,pos.y,level_index,4)
   self.obj_mgr[id] = {pos = {x = pos.x,y = pos.y},cobj = cobj}
   self.obj_count = self.obj_count + 1
   return enter_self,enter_other
@@ -36,10 +36,9 @@ end
 
 function aoi:update(id,np)
   local info = self.obj_mgr[id]
-  local op = {x = info.pos.x,y = info.pos.y}
   info.pos.x = np.x
   info.pos.y = np.y
-  return c.aoi_update(self.core,info.cobj,op.x,op.y,np.x,np.y)
+  return c.aoi_update(self.core,info.cobj,info.pos.x,info.pos.y)
 end
 
 function aoi:viewlist(id)
