@@ -30,7 +30,7 @@ function aoi:leave(id)
   local info = self.obj_mgr[id]
   local leave_other = c.aoi_leave(self.core,info.cobj)
   self.obj_mgr[id] = nil
-  self.obj_count = self.count - 1
+  self.obj_count = self.obj_count - 1
   return leave_other
 end
 
